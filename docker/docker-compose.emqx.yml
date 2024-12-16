@@ -1,0 +1,35 @@
+services:
+  emqx:
+    image: emqx/emqx:latest
+    container_name: emqx
+    hostname: emqx    
+    environment:
+      - "EMQX_NAME=admin"
+      - "EMQX_ADMIN_PASSWORD=d@mn"
+      - "EMQX_HOST=127.0.0.1"
+    networks:
+      emqx-bridge:
+        aliases:
+        - node.emqx.io
+    ports:
+      - "2883:1883"    #host
+      - "8883:8883"    #TLS/SSL
+      - "18083:18083"  #UI
+      - "8084:8084"    #Web socket with TLS/SSL
+    volumes:
+      - vol-emqx-data:/opt/emqx/data
+      - vol-emqx-etc:/opt/emqx/etc
+      - vol-emqx-log:/opt/emqx/log
+    restart: unless-stopped
+
+networks:
+  emqx-bridge:
+    driver: bridge
+
+volumes:
+  vol-emqx-data:
+    name: emqx-data
+  vol-emqx-etc:
+    name: emqx-etc
+  vol-emqx-log:
+    name: emqx-log

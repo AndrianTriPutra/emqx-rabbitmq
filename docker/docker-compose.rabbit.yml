@@ -1,0 +1,28 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    hostname: rabbitmq
+    ports:
+      - "15672:15672"  # RabbitMQ Management UI
+      - "5672:5672"    # AMQP port
+      - "3883:1883"    # MQTT port
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: d@mn
+    networks:
+      rabbit-bridge:
+        aliases:
+        - node.rabbit.io
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq  # Persistent data
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf  # Custom configuration file (optional)
+      - ./enabled_plugins:/etc/rabbitmq/enabled_plugins  # Plugins configuration (optional)
+    restart: unless-stopped
+
+networks:
+  rabbit-bridge:
+    driver: bridge
+
+volumes:
+  rabbitmq_data:
