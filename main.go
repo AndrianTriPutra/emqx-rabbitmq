@@ -14,7 +14,7 @@ func main() {
 	fmt.Println("release: 12.12.24")
 	fmt.Println("==============================")
 
-	conn, err := amqp.Dial("amqp://admin:d@mn@localhost:5672/")
+	conn, err := amqp.Dial("amqp://admin:damn@localhost:5672/")
 	failOnError("Failed to connect to RabbitMQ", err)
 	defer conn.Close()
 
@@ -30,7 +30,16 @@ func main() {
 		false,           // no-wait
 		nil,             // arguments
 	)
-	failOnError("Failed to declare a queue", err)
+	failOnError("Failed to declare a que", err)
+
+	err = ch.QueueBind(
+		q.Name,                      //  queue
+		"smartcity.trafficlights.#", // routing key
+		"amq.topic",                 //  exchange name
+		false,                       // no-wait
+		nil,                         // arguments
+	)
+	failOnError("Failed to declare a bind", err)
 
 	msgs, err := ch.Consume(
 		q.Name, // queue
@@ -50,6 +59,11 @@ func main() {
 			fmt.Println()
 			fmt.Printf("RoutingKey:%s\n", d.RoutingKey)
 			fmt.Printf("Body      :%s\n", d.Body)
+
+			// if auto-ack = false
+			// if err := d.Ack(false); err != nil { //if msg is not ack, it will be requeue
+			// 	failOnError("failed to acknowledge message",err)
+			// }
 		}
 	}()
 
